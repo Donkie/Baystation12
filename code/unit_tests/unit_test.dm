@@ -67,20 +67,26 @@ var/ascii_reset = "[ascii_esc]\[0m"
 /datum/unit_test/proc/log_bad(var/message)
 	log_unit_test("[ascii_red]\[[name]\]: [message][ascii_reset]")
 
+/datum/unit_test/proc/log_result(status, message)
+	SSunit_tests.log_result(status, message, type, name)
+
 /datum/unit_test/proc/fail(var/message)
 	all_unit_tests_passed = 0
 	failed_unit_tests++
 	reported = 1
 	log_unit_test("[ascii_red]!!! FAILURE !!! \[[name]\]: [message][ascii_reset]")
+	log_result(1, message)
 
 /datum/unit_test/proc/pass(var/message)
 	reported = 1
 	log_unit_test("[ascii_green]*** SUCCESS *** \[[name]\]: [message][ascii_reset]")
+	log_result(0, message)
 
 /datum/unit_test/proc/skip(var/message)
 	skipped_unit_tests++
 	reported = 1
 	log_unit_test("[ascii_yellow]--- SKIPPED --- \[[name]\]: [message][ascii_reset]")
+	log_result(2, message)
 
 /datum/unit_test/proc/start_test()
 	fail("No test proc - [type]")

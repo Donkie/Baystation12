@@ -9,6 +9,7 @@ SUBSYSTEM_DEF(unit_tests)
 	var/list/queue = list()
 	var/list/async_tests = list()
 	var/list/current_async
+	var/list/test_results = list()
 	var/stage = 1
 	var/end_unit_tests
 
@@ -35,6 +36,14 @@ SUBSYSTEM_DEF(unit_tests)
 		queue += new test_datum_type
 	log_unit_test("[queue.len] unit tests loaded.")
 	. = ..()
+
+/datum/controller/subsystem/unit_tests/proc/log_result(status, message, type, name)
+	test_results[type] = list("status" = status, "message" = message, "name" = name)
+
+/datum/controller/subsystem/unit_tests/proc/save_result_log()
+	var/file_name = "data/unit_tests.json"
+	fdel(file_name)
+	to_file(file(file_name), json_encode(test_results))
 
 /datum/controller/subsystem/unit_tests/proc/load_map_templates()
 	for(var/map_template_name in (SSmapping.map_templates))
@@ -129,5 +138,6 @@ SUBSYSTEM_DEF(unit_tests)
 		if (6)	// Finalization.
 			unit_test_final_message()
 			log_unit_test("Caught [GLOB.total_runtimes] Runtime\s.")
+			save_result_log()
 			del world
 
